@@ -18,7 +18,7 @@ from . import (
     XlError, wrap_ufunc, replace_empty, get_error, is_not_empty, _convert_args,
     convert_nan, FoundError, value_return
 )
-from statistics import NormalDist
+from scipy.stats import norm
 
 FUNCTIONS = {}
 
@@ -201,15 +201,13 @@ def xnormdist(z, mu, sigma, cumulative=True):
             return Error.errors['#VALUE!']
     if sigma <= 0:
         return Error.errors['#NUM!']
-    norm = NormalDist(mu=mu, sigma=sigma)
-    return norm.cdf(z) if cumulative else norm.pdf(z)
+    return norm.cdf(z, loc=mu, scale=sigma) if cumulative else norm.pdf(z, loc=mu, scale=sigma)
 
 
 def xnorminv(z, mu=0, sigma=1):
     if z <= 0.0 or z >= 1.0 or sigma <= 0:
         return Error.errors['#NUM!']
-    norm = NormalDist(mu=mu, sigma=sigma)
-    return norm.inv_cdf(z)
+    return norm.ppf(z, loc=mu, scale=sigma)
 
 
 FUNCTIONS['_XLFN.NORM.DIST'] = FUNCTIONS['NORM.DIST'] = wrap_ufunc(
