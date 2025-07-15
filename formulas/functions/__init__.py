@@ -235,7 +235,11 @@ def _text2num(value):
         except (ValueError, TypeError):
             from .date import xdate, _text2datetime
             try:
-                return xdate(*_text2datetime(value)[:3])
+                year, month, day, *rest = _text2datetime(value)
+                if year < 1900:
+                    # Return the original string to avoid incorrect date conversion
+                    return value
+                return xdate(year, month, day)
             except (FoundError, AssertionError):
                 pass
     return value
