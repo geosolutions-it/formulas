@@ -22,9 +22,35 @@ OPERATORS = collections.defaultdict(lambda: not_implemented)
 
 numeric_wrap = functools.partial(wrap_ufunc, return_func=value_return)
 
+def fuzzy_add(x, y):
+    """
+    Adds two values with better handling of floating-point errors.
+
+    Tries to convert inputs to floats, adds them, and rounds to 6 decimals
+    to avoid tiny precision issues. If conversion fails, falls back to normal addition.
+
+    Args:
+        x: First value (number or other).
+        y: Second value (number or other).
+
+    Returns:
+        Rounded sum if numeric, else default addition result.
+    """
+    try:
+        if isinstance(x, int) and isinstance(y, int):
+            # Just add integers normally, no rounding needed
+            return x + y
+        else:
+            # Convert to float and round to avoid floating-point issues
+            sum_val = float(x) + float(y)
+            return round(sum_val, 6)
+    except (ValueError, TypeError):
+        # fallback to normal addition or string concat etc.
+        return x + y
+
 # noinspection PyTypeChecker
 OPERATORS.update({k: numeric_wrap(v) for k, v in {
-    '+': lambda x, y: x + y,
+    '+': fuzzy_add,
     '-': lambda x, y: x - y,
     'U-': lambda x: -x,
     '*': lambda x, y: x * y,
