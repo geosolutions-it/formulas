@@ -70,8 +70,11 @@ FUNCTIONS['COUNTA'] = wrap_func(functools.partial(
     xfunc, check=is_not_empty, func=len, _raise=False, default=None
 ))
 FUNCTIONS['COUNTBLANK'] = wrap_func(functools.partial(
-    xfunc, check=lambda x: (x in ('', None) or x is sh.EMPTY), func=len,
-    _raise=False, default=None
+    xfunc,
+    check=lambda x: (x in ('', None) or x is sh.EMPTY or (isinstance(x, float) and math.isnan(x))),
+    func=len,
+    _raise=False,
+    default=None
 ))
 FUNCTIONS['COUNTIF'] = wrap_func(functools.partial(
     xfilter, len, operating_range=None
